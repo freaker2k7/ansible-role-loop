@@ -16,10 +16,10 @@
         - meta: noop
       {% if loop_apply | bool %}    vars:
             apply: &apply {{ loop_apply | to_json }}{{ newline }}{% endif %}
-        - name: loop on role {{ loop_role }}
+        - name: loop on role {{ loop_this_item.role | default(loop_role) }}
           # include_role ends up with undefined vars in handlers
           import_role:
-            name: {{ loop_role }}
+            name: {{ loop_this_item.role | default(loop_role) }}
       {% if loop_defaults_from | bool %}      defaults_from: {{ loop_defaults_from ~ newline }}{% endif %}
       {% if loop_handlers_from | bool %}      handlers_from: {{ loop_handlers_from ~ newline }}{% endif %}
       {% if loop_tasks_from | bool %}      tasks_from: {{ loop_tasks_from ~ newline }}{% endif %}
@@ -27,7 +27,9 @@
       {% if loop_allow_duplicates | bool %}      allow_duplicates: {{ loop_allow_duplicates ~ newline }}{% endif %}
         vars:
       {% for myvar in loop_this_item.keys() %}
+      {% if myvar != 'role' %}
             {{ loop_prefix ~ myvar ~ ': "{{ loop_this_item.' ~ myvar ~ ' }}"' }}
+      {% endif %}
       {% endfor %}
       {% if loop_apply | bool %}  <<: *apply{{ newline }}{% endif %}
   changed_when: no

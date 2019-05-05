@@ -2,7 +2,7 @@
 # defaults file for loop
 
 # string to add as a prefix for role vars
-loop_prefix: "{{ loop_role | lower | regex_replace('[-/]', '_') ~ '_' }}"
+loop_prefix: "{{ loop_role | default('', true) | lower | regex_replace('[^a-zA-Z]', '_') ~ '_' | regex_replace('^_') }}"
 
 # options to apply to import_role
 loop_allow_duplicates: "{{ omit }}"

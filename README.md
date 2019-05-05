@@ -18,7 +18,7 @@ See `defaults/main.yml`
 # role to loop over
 loop_role: <your role here>  # required
 # string to add as a prefix for role vars
-loop_prefix: "{{ loop_role | lower | regex_replace('[-/]', '_') ~ '_' }}"
+loop_prefix: "{{ loop_role | default('', true) | lower | regex_replace('[^a-zA-Z]', '_') ~ '_' | regex_replace('^_') }}"
 # items to loop over
 loop_items: []  # required
 ```
@@ -80,6 +80,28 @@ Same thing except passing list of items as a variable:
       - role: loop
         loop_role: vm
         loop_items: "{{ vm_list }}"
+
+Loading various roles:
+
+    - name: install a libvirt and openstack VM
+      hosts: localhost
+      vars:
+        roles_list:
+        - role: docker
+          registry: example.com:5000
+        - role: kubernetes
+        - role: vm
+          type: libvirt
+          host: virthost
+          cpu_cores: 4
+          memory: 4096
+        - role: vm
+          type: openstack
+          memory: 4096
+          image: cirros
+      roles:
+      - role: loop
+        loop_items: "{{ roles_list }}"
 
 
 License
